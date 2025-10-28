@@ -1,0 +1,13 @@
+-- +goose Up
+CREATE TABLE IF NOT EXISTS teams (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  short_code TEXT NOT NULL UNIQUE,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  note TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- +goose Down
+DROP TABLE IF EXISTS teams;

@@ -1,0 +1,94 @@
+name: Deploy to Ubuntu Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Bot
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.1'
+
+      - name: Build binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bot ./cmd/bot
+
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          DB_DSN: ${{ secrets.DB_DSN }}
+          ADMIN_IDS: ${{ secrets.ADMIN_IDS }}
+          CLUB_TZ: ${{ secrets.CLUB_TZ }}
+        run: |
+          # Настройка SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+
+          # Создание директории на сервере
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST "mkdir -p /opt/dynamost-bot"
+
+          # Копирование бинарника
+          scp -i ~/.ssh/deploy_key bot $SERVER_USER@$SERVER_HOST:/opt/dynamost-bot/
+
+          # Копирование миграций
+          scp -i ~/.ssh/deploy_key -r migrations $SERVER_USER@$SERVER_HOST:/opt/dynamost-bot/
+
+          # Создание .env файла на сервере
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST "cat > /opt/dynamost-bot/.env << EOF
+          BOT_TOKEN=$BOT_TOKEN
+          DB_DSN=$DB_DSN
+          ADMIN_IDS=$ADMIN_IDS
+          CLUB_TZ=$CLUB_TZ
+          EOF"
+
+          # Установка goose если ещё не установлен
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST "
+            if ! command -v goose &> /dev/null; then
+              echo 'Installing goose...'
+              curl -fsSL https://raw.githubusercontent.com/pressly/goose/master/install.sh | sh
+              sudo mv ./bin/goose /usr/local/bin/
+            fi
+          "
+
+          # Запуск миграций
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST "
+            cd /opt/dynamost-bot
+            goose -dir ./migrations postgres '$DB_DSN' up
+          "
+
+          # Копирование systemd service файла
+          scp -i ~/.ssh/deploy_key deploy/dynamost-bot.service $SERVER_USER@$SERVER_HOST:/tmp/
+          
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST "
+            sudo mv /tmp/dynamost-bot.service /etc/systemd/system/
+            sudo systemctl daemon-reload
+            sudo systemctl enable dynamost-bot
+            sudo systemctl restart dynamost-bot
+          "
+
+          echo "✅ Deployment completed successfully!"
+
+      - name: Check service status
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_HOST "sudo systemctl status dynamost-bot --no-pager"
+

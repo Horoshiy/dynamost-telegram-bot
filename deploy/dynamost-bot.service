@@ -1,0 +1,28 @@
+[Unit]
+Description=Dynamost Telegram Bot
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=dynamost
+Group=dynamost
+WorkingDirectory=/opt/dynamost-bot
+EnvironmentFile=/opt/dynamost-bot/.env
+ExecStart=/opt/dynamost-bot/bot
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dynamost-bot
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/dynamost-bot
+
+[Install]
+WantedBy=multi-user.target
+
