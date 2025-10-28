@@ -25,9 +25,22 @@ ssh user@your-server-ip
 
 #### 1.2. Запустите скрипт автоматической настройки
 
+**Вариант А: Скопировать с локальной машины**
+
+```bash
+# На локальной машине скопируйте скрипт на сервер
+scp deploy/setup-server.sh user@your-server:/home/user/
+
+# На сервере запустите
+chmod +x setup-server.sh
+sudo ./setup-server.sh
+```
+
+**Вариант Б: Скачать из GitHub (после git push)**
+
 ```bash
 # Скачайте скрипт
-wget https://raw.githubusercontent.com/dynamost/telegram-bot/main/deploy/setup-server.sh
+wget https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/deploy/setup-server.sh
 
 # Дайте права на выполнение
 chmod +x setup-server.sh
@@ -35,6 +48,8 @@ chmod +x setup-server.sh
 # Запустите с правами sudo
 sudo ./setup-server.sh
 ```
+
+**Замените** `YOUR_USERNAME/YOUR_REPO` на ваш GitHub репозиторий!
 
 #### 1.3. Сохраните вывод скрипта
 

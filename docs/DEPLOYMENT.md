@@ -40,6 +40,7 @@ sudo ./setup-server.sh
 ```
 
 Скрипт автоматически:
+
 - Обновит систему
 - Установит PostgreSQL
 - Создаст системного пользователя `dynamost`
@@ -149,15 +150,15 @@ psql "postgres://dynamost:your_secure_password@localhost:5432/dynamost_bot?sslmo
 
 ### Обязательные секреты
 
-| Секрет | Описание | Пример |
-|--------|----------|--------|
-| `SSH_PRIVATE_KEY` | Приватный SSH ключ для деплоя | Содержимое файла `~/.ssh/id_ed25519` |
-| `SERVER_HOST` | IP адрес или домен сервера | `123.45.67.89` или `bot.example.com` |
-| `SERVER_USER` | Имя пользователя для SSH | `ubuntu` или `root` |
-| `BOT_TOKEN` | Токен Telegram бота | `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz` |
-| `DB_DSN` | Строка подключения к PostgreSQL | `postgres://dynamost:password@localhost:5432/dynamost_bot?sslmode=disable` |
-| `ADMIN_IDS` | ID администраторов через запятую | `123456789,987654321` |
-| `CLUB_TZ` | Временная зона клуба | `Europe/Moscow` или `UTC` |
+| Секрет            | Описание                         | Пример                                                                     |
+| ----------------- | -------------------------------- | -------------------------------------------------------------------------- |
+| `SSH_PRIVATE_KEY` | Приватный SSH ключ для деплоя    | Содержимое файла `~/.ssh/id_ed25519`                                       |
+| `SERVER_HOST`     | IP адрес или домен сервера       | `123.45.67.89` или `bot.example.com`                                       |
+| `SERVER_USER`     | Имя пользователя для SSH         | `ubuntu` или `root`                                                        |
+| `BOT_TOKEN`       | Токен Telegram бота              | `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`                                    |
+| `DB_DSN`          | Строка подключения к PostgreSQL  | `postgres://dynamost:password@localhost:5432/dynamost_bot?sslmode=disable` |
+| `ADMIN_IDS`       | ID администраторов через запятую | `123456789,987654321`                                                      |
+| `CLUB_TZ`         | Временная зона клуба             | `Europe/Moscow` или `UTC`                                                  |
 
 ### Получение значений секретов
 
@@ -189,12 +190,14 @@ chmod 600 ~/.ssh/authorized_keys
 #### 2. BOT_TOKEN
 
 Получите токен у [@BotFather](https://t.me/BotFather):
+
 1. Отправьте `/newbot` или `/token` (для существующего бота)
 2. Скопируйте полученный токен
 
 #### 3. ADMIN_IDS
 
 Узнайте свой Telegram ID:
+
 1. Напишите боту [@userinfobot](https://t.me/userinfobot)
 2. Скопируйте значение `Id`
 3. Для нескольких администраторов перечислите через запятую: `123456789,987654321`
@@ -204,6 +207,7 @@ chmod 600 ~/.ssh/authorized_keys
 Список временных зон: [en.wikipedia.org/wiki/List_of_tz_database_time_zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 
 Для России:
+
 - Москва: `Europe/Moscow` (UTC+3)
 - Санкт-Петербург: `Europe/Moscow` (UTC+3)
 - Екатеринбург: `Asia/Yekaterinburg` (UTC+5)
@@ -219,6 +223,7 @@ chmod 600 ~/.ssh/authorized_keys
 После настройки GitHub Secrets деплой происходит автоматически:
 
 1. **При push в ветку `main`:**
+
    ```bash
    git push origin main
    ```
@@ -354,11 +359,13 @@ sudo systemctl start dynamost-bot
 ### Бот не запускается
 
 Проверьте логи:
+
 ```bash
 sudo journalctl -u dynamost-bot -n 100
 ```
 
 Частые причины:
+
 - Неверный `BOT_TOKEN` — проверьте секреты в GitHub
 - Не удается подключиться к БД — проверьте `DB_DSN` и доступность PostgreSQL
 - Не применены миграции — запустите `make migrate-up` вручную
@@ -453,6 +460,7 @@ crontab -e
 ## Контакты и поддержка
 
 При возникновении проблем:
+
 1. Проверьте раздел [Troubleshooting](#troubleshooting)
 2. Изучите логи бота: `sudo journalctl -u dynamost-bot -n 100`
 3. Создайте Issue в GitHub репозитории
@@ -460,4 +468,3 @@ crontab -e
 ---
 
 **Удачного деплоя! ⚽️**
-

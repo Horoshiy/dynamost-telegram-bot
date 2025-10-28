@@ -33,8 +33,20 @@ chown dynamost:dynamost /opt/dynamost-bot
 echo "Установка goose..."
 if ! command -v goose &> /dev/null; then
     curl -fsSL https://raw.githubusercontent.com/pressly/goose/master/install.sh | sh
-    mv ./bin/goose /usr/local/bin/
-    chmod +x /usr/local/bin/goose
+    # Новый установщик может ставить напрямую в /usr/local/bin
+    if [ -f ./bin/goose ]; then
+        mv ./bin/goose /usr/local/bin/
+        chmod +x /usr/local/bin/goose
+        rm -rf ./bin
+    fi
+fi
+
+# Проверка установки goose
+if ! command -v goose &> /dev/null; then
+    echo "⚠️  Предупреждение: goose не установлен автоматически."
+    echo "Установите вручную: https://github.com/pressly/goose/releases"
+else
+    echo "✅ goose установлен: $(goose --version)"
 fi
 
 echo ""

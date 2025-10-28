@@ -6,9 +6,38 @@
 
 На Ubuntu сервере выполните:
 
+### Вариант А: Скачать скрипт из GitHub (если уже запушен)
+
 ```bash
 # Скачайте и запустите скрипт настройки
-wget https://raw.githubusercontent.com/dynamost/telegram-bot/main/deploy/setup-server.sh
+wget https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/deploy/setup-server.sh
+chmod +x setup-server.sh
+sudo ./setup-server.sh
+```
+
+**Замените** `YOUR_USERNAME` и `YOUR_REPO` на ваши данные!
+
+### Вариант Б: Скопировать скрипт вручную (если еще не в GitHub)
+
+```bash
+# Скопируйте файл deploy/setup-server.sh с локальной машины на сервер
+scp deploy/setup-server.sh user@your-server:/home/user/
+
+# На сервере запустите
+chmod +x setup-server.sh
+sudo ./setup-server.sh
+```
+
+### Вариант В: Создать скрипт на сервере
+
+```bash
+# Создайте файл
+nano setup-server.sh
+
+# Вставьте содержимое из deploy/setup-server.sh
+# Сохраните (Ctrl+O, Enter, Ctrl+X)
+
+# Запустите
 chmod +x setup-server.sh
 sudo ./setup-server.sh
 ```
